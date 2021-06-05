@@ -4,7 +4,7 @@ Upload your backups to Google Drive.
 
 ## Docker
 
-<https://hub.docker.com/reduardo7/backup-to-drive>.
+<https://hub.docker.com/r/reduardo7/backup-to-drive>.
 
 ### Variables
 
