@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "tgreen7.vs-code-node-require",
+    "leizongmin.node-module-intellisense",
+    "eg2.vscode-npm-script",
+    "christian-kohler.npm-intellisense",
+    "streetsidesoftware.code-spell-checker-spanish",
+    "in4margaret.compareit",
+    "donjayamanne.githistory",
+    "xyz.local-history",
+    "esbenp.prettier-vscode"
+  ]
+}
