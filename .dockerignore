@@ -1,6 +1,2 @@
 .history
-node_modules
-*.md
 .vscode
-.eslint*
-.nvmrc

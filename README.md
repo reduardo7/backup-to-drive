@@ -6,13 +6,13 @@ Upload your backups to Google Drive.
 
 <https://hub.docker.com/r/reduardo7/backup-to-drive>.
 
+## Build
+
+```bash
+docker-compose build
+```
+
 ### Variables
-
-#### `FILE_PATH`
-
-[**Required**]
-
-Full file path.
 
 #### `DRIVE_FOLDER_ID`
 
@@ -20,57 +20,14 @@ Full file path.
 
 Google Drive folder ID.
 
-#### `RETRY_ON_ERROR`
-
-[**Optional**]
-
-Retry on error times.
-
-_Default_: `0`.
-
-#### `GOOGLE_CLIENT_EMAIL`
-
-[**Required**]
-
-Google Client e-Mail.
-
-#### `GOOGLE_PRIVATE_KEY`
-
-[**Required**]
-
-Google Private Key.
-
-#### `CRON_CONFIG`
-
-[**Optional**]
-
-See cron config at <https://www.npmjs.com/package/node-cron>.
-
-```text
- # ┌────────────── second (optional)
- # │ ┌──────────── minute
- # │ │ ┌────────── hour
- # │ │ │ ┌──────── day of month
- # │ │ │ │ ┌────── month
- # │ │ │ │ │ ┌──── day of week
- # │ │ │ │ │ │
- # │ │ │ │ │ │
- # * * * * * *
-```
-
-_Default_: `null`.
-
 ### Docker example
 
 ```bash
 docker run --rm \
   -v "$(pwd):/backups:ro" \
-  -e FILE_PATH='/backups/backup.7z' \
-  -e DRIVE_FOLDER_ID='' \
-  -e RETRY_ON_ERROR=3 \
-  -e GOOGLE_CLIENT_EMAIL='' \
-  -e GOOGLE_PRIVATE_KEY='' \
-  reduardo7/backup-to-drive:latest
+  -e DRIVE_FOLDER_ID='xxx' \
+  reduardo7/backup-to-drive:latest \
+  gdrive-upload /backups/file-to-backup.7z
 ```
 
 ### Docker-Compose example
@@ -82,12 +39,46 @@ services:
   backup:
     image: reduardo7/backup-to-drive:latest
     environment:
-      # CRON_CONFIG: ...
-      FILE_PATH: '/backups/backup.7z'
-      DRIVE_FOLDER_ID: ''
-      RETRY_ON_ERROR: 3
-      GOOGLE_CLIENT_EMAIL: ''
-      GOOGLE_PRIVATE_KEY: ''
+      DRIVE_FOLDER_ID: 'xxx'
     volumes:
       - ./:/backups:ro
+    command: gdrive-upload /backups/file-to-backup.7z
 ```
+
+## Initial setup
+
+### A. Google Account setup
+
+1. Go to
+<https://console.cloud.google.com/apis/credentials>.
+
+### B. Docker setup
+
+1. We will need to give access to _Google Drive_ to allow this program to connect to your account. To do this, insert below command:
+
+    ```bash
+    docker run \
+      -ti \
+      -v $(pwd)/.data/gdrive:/root/.gdrive \
+      reduardo7/backup-to-drive:latest \
+      gdrive list
+    ```
+
+2. Copy the link it gives you to your browser and chooses your google drive account.
+3. Click Allow button to give access.
+4. Copy the generated verification code and insert into a terminal.
+5. Now we are done... Let's upload a file.
+
+    ```bash
+    docker run \
+      -ti \
+      -v $(pwd)/.data/gdrive:/root/.gdrive \
+      -v /path/to/file:/uploads/file:ro
+      reduardo7/backup-to-drive:latest \
+      gdrive upload /uploads/file
+    ```
+
+## References
+
+- <https://www.serverkaka.com/2018/05/upload-file-to-google-drive-from-the-command-line-terminal.html>
+- <https://github.com/prasmussen/gdrive>

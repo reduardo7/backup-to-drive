@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  backup-to-drive:
+    build: .
+    image: reduardo7/backup-to-drive:local
+    volumes:
+      - gdrive:/root/.gdrive
+
+volumes:
+  gdrive:
