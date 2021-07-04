@@ -81,10 +81,10 @@ This image defines a volume for `/root/.gdrive` for **_Google_ token storage**.
 ```bash
 docker run --rm \
   -v $(pwd)/.data/gdrive:/root/.gdrive \
-  -v "$(pwd):/backups:ro" \
+  -v "$(pwd)/backups:/backups:ro" \
   -e DRIVE_FOLDER_ID='xxx' \
   reduardo7/backup-to-drive:latest \
-  gdrive-sync-upload /backups/file-to-backup.7z
+  gdrive-sync-upload /backups
 ```
 
 ## Docker-Compose example
@@ -99,8 +99,8 @@ services:
       DRIVE_FOLDER_ID: "xxx"
     volumes:
       - ./.data/gdrive:/root/.gdrive
-      - ./:/backups:ro
-    command: gdrive-sync-upload /backups/file-to-backup.7z
+      - ./backups:/backups:ro
+    command: gdrive-sync-upload /backups
 ```
 
 ## References
