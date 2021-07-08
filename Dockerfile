@@ -1,16 +1,7 @@
-# Compiler step
-FROM ubuntu as compiler
+FROM ubuntu 
 
-RUN apt-get update && apt-get install -y wget
+RUN apt-get update && apt-get install -y curl
 
-ARG GDRIVE_VERSION=2.1.1
-COPY download-gdrive.sh /download-gdrive.sh
-RUN /download-gdrive.sh
-
-# Final image
-FROM ubuntu as gdrive
-
-COPY --from=compiler /usr/local/bin/gdrive /usr/local/bin/gdrive
-COPY gdrive-sync-upload.sh /usr/local/bin/gdrive-sync-upload
+COPY gdrive-upload.sh /usr/local/bin/gdrive-upload
 
 VOLUME /root/.gdrive

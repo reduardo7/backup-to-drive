@@ -27,51 +27,12 @@ is the **folder ID**.
 
 ## Initial setup
 
-1. Go to <https://console.cloud.google.com/apis/credentials> and create a **Oauth** credential.
-2. We will need to give access to _Google Drive_ to allow this program to connect to your account.
-   To do this, insert below command:
-
-   ```bash
-   docker run \
-     -ti \
-     -v $(pwd)/.data/gdrive:/root/.gdrive \
-     reduardo7/backup-to-drive:latest \
-     gdrive list
-   ```
-
-3. Copy the **link** it gives you to your browser and chooses your _Google Drive_ account. Replace `client_id` with your generated **Client ID** at step _#1_.
-4. Click **Allow** button to give access.
-5. Copy the **generated verification code** and insert into a **terminal**.
-6. Now we are done... Let's upload a file.
-
-   ```bash
-   docker run \
-     -ti \
-     -v $(pwd)/.data/gdrive:/root/.gdrive \
-     -v /path/to/file:/uploads/file:ro \
-     reduardo7/backup-to-drive:latest \
-     gdrive upload /uploads/file
-   ```
-
-## Available _Google Drive_ commands
-
-### `gdrive`
-
-See official [`gdrive` usage documentation](https://github.com/prasmussen/gdrive#usage).
-
-### `gdrive-sync-upload`
-
-**Upload and sync** a directory to specific _Google Drive_ **folder ID** defined with the
-[`DRIVE_FOLDER_ID`](#drive_folder_id) [environment variable](#environment-variables).
-
-> **WARNING**: This will delete files on the directory defined at [`DRIVE_FOLDER_ID`](#drive_folder_id)!
-> Please **be careful**!
-
-- **Required Environment Variables:**
-  - [`DRIVE_FOLDER_ID`](#drive_folder_id): See [`DRIVE_FOLDER_ID`](#drive_folder_id) documentation
-    at [environment variables section](#environment-variables).
-- **Arguments:**
-  1. `sync_path`: Full directory path to upload in the current _Docker container environment_.
+1. Go to <https://console.developers.google.com/apis/credentials?pli=1>
+2. After this has been done we select the Credentials tab (on the left) and “create credentials” from the top.
+3. When asked for the app type, we select "TV and other".
+4. Finally, this generates a "client id" and a "client seacret".
+5. Go to <https://console.cloud.google.com/apis/credentials/consent> and make it "publicated".
+6. Enable Google Drive API at <https://console.cloud.google.com/apis/library/drive.googleapis.com>.
 
 ## Where to Store Data
 
@@ -83,9 +44,11 @@ This image defines a volume for `/root/.gdrive` for **_Google_ token storage**.
 docker run --rm \
   -v $(pwd)/.data/gdrive:/root/.gdrive \
   -v "$(pwd)/backups:/backups:ro" \
-  -e DRIVE_FOLDER_ID='xxx' \
+  -e GDRIVE_CLIENT_ID='[your GDRIVE_CLIENT_ID]' \
+  -e GDRIVE_CLIENT_SECRET='[your GDRIVE_CLIENT_SECRET]' \
+  -e GDRIVE_FOLDER_ID='[your GDRIVE_FOLDER_ID]' \
   reduardo7/backup-to-drive:latest \
-  gdrive-sync-upload /backups
+  gdrive-upload /backups/file.7z
 ```
 
 ## Docker-Compose example
@@ -97,11 +60,13 @@ services:
   backup:
     image: reduardo7/backup-to-drive:latest
     environment:
-      DRIVE_FOLDER_ID: "xxx"
+      GDRIVE_CLIENT_ID: '[your GDRIVE_CLIENT_ID]'
+      GDRIVE_CLIENT_SECRET: '[your GDRIVE_CLIENT_SECRET]'
+      GDRIVE_FOLDER_ID: '[your GDRIVE_FOLDER_ID]'
     volumes:
       - ./.data/gdrive:/root/.gdrive
       - ./backups:/backups:ro
-    command: gdrive-sync-upload /backups
+    command: gdrive-upload /backups/file.7z
 ```
 
 ## References
