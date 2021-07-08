@@ -27,7 +27,8 @@ is the **folder ID**.
 
 ## Initial setup
 
-1. We will need to give access to _Google Drive_ to allow this program to connect to your account.
+1. Go to <https://console.cloud.google.com/apis/credentials> and create a **Oauth** credential.
+2. We will need to give access to _Google Drive_ to allow this program to connect to your account.
    To do this, insert below command:
 
    ```bash
@@ -38,10 +39,10 @@ is the **folder ID**.
      gdrive list
    ```
 
-2. Copy the **link** it gives you to your browser and chooses your _Google Drive_ account.
-3. Click **Allow** button to give access.
-4. Copy the **generated verification code** and insert into a **terminal**.
-5. Now we are done... Let's upload a file.
+3. Copy the **link** it gives you to your browser and chooses your _Google Drive_ account. Replace `client_id` with your generated **Client ID** at step _#1_.
+4. Click **Allow** button to give access.
+5. Copy the **generated verification code** and insert into a **terminal**.
+6. Now we are done... Let's upload a file.
 
    ```bash
    docker run \
