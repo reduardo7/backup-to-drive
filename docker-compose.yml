@@ -4,6 +4,7 @@ services:
   backup-to-drive:
     build: .
     image: reduardo7/backup-to-drive:local
+    env_file: ./config.env
     volumes:
       - gdrive:/root/.gdrive
 
