@@ -55,6 +55,8 @@ _json() {
 }
 
 _waitForAuth() {
+  local retries=0
+
   while true; do
     response="$(
       curl \
@@ -62,13 +64,21 @@ _waitForAuth() {
         -d "client_secret=${GDRIVE_CLIENT_SECRET}" \
         -d "device_code=${device_code}" \
         -d 'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code' \
+        -d 'access_type=offline' \
+        -d 'approval_prompt=force' \
         https://accounts.google.com/o/oauth2/token 2>/dev/null
     )"
     eval $(_json "${response}")
     
     if [ -z "${access_token}" ]; then
-      # Waiting...
-      sleep 3
+      retries=$((retries+1))
+      if [[ ${retries} == 200 ]]; then
+        echo >&2 'Wait time reached!'
+        exit 2
+      else
+        # Waiting...
+        sleep 3
+      fi
     else
       return
     fi
@@ -108,14 +118,24 @@ if [ -z "${GDRIVE_ACCESS_TOKEN}" ]; then
   fi
 fi
 
-curl -X POST -L \
-  -H "Authorization: Bearer ${GDRIVE_ACCESS_TOKEN}" \
-  -F "metadata={\
-    \"title\": \"${name}\", \
-    \"name\": \"${name}\", \
-    \"parents\": [\"${GDRIVE_FOLDER_ID}\"] \
-  };type=application/json;charset=UTF-8" \
-  -F "file=@${file}" \
-  'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart'
+_upload() {
+  curl -X POST -L \
+    -H "Authorization: Bearer ${GDRIVE_ACCESS_TOKEN}" \
+    -F "metadata={\
+      \"title\": \"${name}\", \
+      \"name\": \"${name}\", \
+      \"parents\": [\"${GDRIVE_FOLDER_ID}\"] \
+    };type=application/json;charset=UTF-8" \
+    -F "file=@${file}" \
+    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart'
+
+  return $?
+}
+
+_upload || {
+  echo >&2 'Upload fail! Try again with new token...'
+  _getToken
+  _upload
+}
 
 echo Done
