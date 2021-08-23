@@ -69,7 +69,46 @@ services:
     command: gdrive-upload /backups/file.7z
 ```
 
+## Recover backup
+
+```bash
+#!/usr/bin/env bash
+set -ex
+ggID=${1}
+
+[ ! -z "${ggID}" ] || {
+  echo >&2 "Downlaod backup file. Usage: ${0} [File ID]"
+  exit 1
+}
+
+ggURL='https://drive.google.com/uc?export=download'  
+filename="$(curl -sc /tmp/gcokie "${ggURL}&id=${ggID}" | grep -o '="uc-name.*</span>' | sed 's/.*">//;s/<.a> .*//')"
+
+[ -z "${filename}"] && filename="bkp-${ggID}.7z"
+
+[ ! -f "${filename}" ] || {
+  echo >&2 "Error! File '${filename}' already exists"
+  exit 2
+}
+
+getcode="$(awk '/_warning_/ {print $NF}' /tmp/gcokie)"  
+curl -Lb /tmp/gcokie "${ggURL}&confirm=${getcode}&id=${ggID}" -o "${filename}"
+
+server_data_dir='.data/server/'
+
+sudo mv "${filename}" "${server_data_dir}"
+cd "${server_data_dir}"
+sudo 7zr x "${filename}"
+sudo rm -f "${filename}"
+
+[ ! -d world ] || sudo mv world "world.bkp-${filename}"
+sudo mv saves-bkp-* world
+
+echo Done
+```
+
 ## References
 
 - <https://www.serverkaka.com/2018/05/upload-file-to-google-drive-from-the-command-line-terminal.html>
 - <https://github.com/prasmussen/gdrive>
+- <https://stackoverflow.com/a/38937732/717267>
